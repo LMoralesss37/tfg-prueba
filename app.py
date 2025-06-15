@@ -79,8 +79,10 @@ with gr.Blocks(css=tema_css) as interfaz:
     login = gr.Column(visible=True)
     with login:
         with gr.Row():
-            logo = gr.Image(value="logo.png", type="filepath", show_label=False, show_download_button=False, container=False, height=80, width=80)
-            gr.Markdown("<h1 style='font-size:55px; font-family: Arial, sans-serif;'>CandiLVerse</h1>")
+            with gr.Column(scale=0):  # Le damos escala 0 o muy pequeña
+                gr.Image("logo.png", height=60, width=60, show_label=False)
+            with gr.Column():
+                gr.Markdown("<h1 style='font-size:45px;color:#0C4876'>CandiLVerse</h1>")
         gr.Markdown("## Iniciar sesión")
         usuario_input = gr.Textbox(label="Usuario")
         contraseña_input = gr.Textbox(label="Contraseña", type="password")
@@ -91,8 +93,11 @@ with gr.Blocks(css=tema_css) as interfaz:
     filtros = gr.Column(visible=False)
     with filtros:
         with gr.Row():
-            logo2 = gr.Image(value="logo.png", type="filepath", show_label=False, show_download_button=False, container=False, height=80, width=80)
-            gr.Markdown("<h1 style='font-size:55px; font-family: Arial, sans-serif;'>CandiLVerse</h1>")
+            with gr.Column(scale=0):  # Le damos escala 0 o muy pequeña
+                gr.Image("logo.png", height=60, width=60, show_label=False)
+            with gr.Column():
+                gr.Markdown("<h1 style='font-size:45px;color:#0C4876'>CandiLVerse</h1>")
+
 
         with gr.Row():
             nombre = gr.Textbox(label="Filtro por Nombre")
