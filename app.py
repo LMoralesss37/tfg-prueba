@@ -2,41 +2,51 @@ import gradio as gr
 import pandas as pd
 import os
 
-# Ruta fija al CSV (supongamos que siempre se llama igual)
-CSV_PATH = "prueba.csv"
+# Ruta al CSV que ya está en el repo
+CSV_PATH = "datos.csv"
 
-# Función para aplicar filtros sobre el CSV que ya está subido
+# Función para procesar el CSV y aplicar filtros
 def procesar_csv(nombre_filtro, apellidos_filtro, fecha_inicio_filtro, fecha_fin_filtro):
     try:
         df = pd.read_csv(CSV_PATH)
-    except Exception:
-        df = pd.read_csv(CSV_PATH, sep=None, engine='python')
+    except Exception as e:
+        return f"Error al leer el CSV: {str(e)}"
 
-    df_limpio = df.copy()
+    # Limpiar el dataframe (solo eliminamos nulos)
+    df_limpio = df.dropna()
 
-    df_limpio = df_limpio.dropna()
-    df_limpio.columns = df_limpio.columns.str.replace(';;', '', regex=False)
-    df_limpio['Hora de conexión'] = df_limpio['Hora de conexión'].str.split('.').str[0]
-    df_limpio['Tiempo de juego'] = df_limpio['Tiempo de juego'].str.split('.').str[0]
-    df_limpio['Fecha de conexión'] = pd.to_datetime(df_limpio['Fecha de conexión']).dt.strftime('%d/%m/%Y')
-    df_limpio['% tarea completado'] = df_limpio['% tarea completado'].apply(lambda x: f"{x}%")
-    df_limpio['Dolor'] = df_limpio['Dolor'].str.replace(';;', '', regex=False)
+    # Convertimos % tarea completado a formato de porcentaje
+    if "% tarea completado" in df_limpio.columns:
+        df_limpio['% tarea completado'] = df_limpio['% tarea completado'].astype(str) + '%'
 
-    if nombre_filtro:
-        df_limpio = df_limpio[df_limpio['Nombre y apellidos'].str.contains(nombre_filtro, case=False, na=False)]
-    
-    if apellidos_filtro:
-        df_limpio = df_limpio[df_limpio['Nombre y apellidos'].str.contains(apellidos_filtro, case=False, na=False)]
-    
-    if fecha_inicio_filtro and fecha_fin_filtro:
-        df_limpio['Fecha de conexión'] = pd.to_datetime(df_limpio['Fecha de conexión'], format='%d/%m/%Y')
-        fecha_inicio = pd.to_datetime(fecha_inicio_filtro, format='%d/%m/%Y')
-        fecha_fin = pd.to_datetime(fecha_fin_filtro, format='%d/%m/%Y')
-        df_limpio = df_limpio[(df_limpio['Fecha de conexión'] >= fecha_inicio) & (df_limpio['Fecha de conexión'] <= fecha_fin)]
+    # Normalizamos la fecha (solo si aún no es datetime)
+    if 'Fecha de conexión' in df_limpio.columns:
+        if not pd.api.types.is_datetime64_any_dtype(df_limpio['Fecha de conexión']):
+            df_limpio['Fecha de conexión'] = pd.to_datetime(df_limpio['Fecha de conexión'], format='%d/%m/%Y')
+
+    # Filtrar por nombre
+    if nombre_filtro and 'Nombre' in df_limpio.columns:
+        df_limpio = df_limpio[df_limpio['Nombre'].str.contains(nombre_filtro, case=False, na=False)]
+
+    # Filtrar por apellidos
+    if apellidos_filtro and 'Apellidos' in df_limpio.columns:
+        df_limpio = df_limpio[df_limpio['Apellidos'].str.contains(apellidos_filtro, case=False, na=False)]
+
+    # Filtrar por fechas
+    if fecha_inicio_filtro and fecha_fin_filtro and 'Fecha de conexión' in df_limpio.columns:
+        try:
+            fecha_inicio = pd.to_datetime(fecha_inicio_filtro, format='%d/%m/%Y')
+            fecha_fin = pd.to_datetime(fecha_fin_filtro, format='%d/%m/%Y')
+            df_limpio = df_limpio[(df_limpio['Fecha de conexión'] >= fecha_inicio) & (df_limpio['Fecha de conexión'] <= fecha_fin)]
+        except Exception as e:
+            return f"Error al convertir fechas: {str(e)}"
+
+    # Por estética: volvemos a formatear la fecha como string para Gradio
+    df_limpio['Fecha de conexión'] = df_limpio['Fecha de conexión'].dt.strftime('%d/%m/%Y')
 
     return df_limpio
 
-# Crear la interfaz de Gradio sin necesidad de subir el CSV
+# Crear la interfaz de Gradio
 inputs = [
     gr.Textbox(label="Filtro por Nombre"),
     gr.Textbox(label="Filtro por Apellidos"),
@@ -53,10 +63,7 @@ iface = gr.Interface(
     live=True
 )
 
-# IMPORTANTE: Para Render
+# Configuración para Render (importantísimo para que abra el puerto)
 port = int(os.environ.get("PORT", 7860))
 iface.launch(server_name="0.0.0.0", server_port=port)
 
-
-port = int(os.environ.get("PORT", 7860))
-iface.launch(server_name="0.0.0.0", server_port=port)
