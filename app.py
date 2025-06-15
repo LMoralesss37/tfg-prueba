@@ -70,11 +70,6 @@ input, textarea {
     background-color: #C2ACB4 !important;
     color: #0C4876 !important;
 }
-.logo-pequeno img {
-    max-height: 60px !important;
-    max-width: 60px !important;
-    object-fit: contain;
-}
 """
 
 # Interfaz principal
@@ -84,7 +79,7 @@ with gr.Blocks(css=tema_css) as interfaz:
     login = gr.Column(visible=True)
     with login:
         with gr.Row():
-            logo = gr.Image(value="logo.png", type="filepath", show_label=False, show_download_button=False, container=False, elem_classes=["logo-pequeno"])
+            logo = gr.Image(value="logo.png", type="filepath", show_label=False, show_download_button=False, container=False, height=80, width=80)
             gr.Markdown("<h1 style='font-size:55px; font-family: Arial, sans-serif;'>CandiLVerse</h1>")
         gr.Markdown("## Iniciar sesión")
         usuario_input = gr.Textbox(label="Usuario")
@@ -96,7 +91,7 @@ with gr.Blocks(css=tema_css) as interfaz:
     filtros = gr.Column(visible=False)
     with filtros:
         with gr.Row():
-            logo2 = gr.Image(value="logo.png", type="filepath", show_label=False, show_download_button=False, container=False, elem_classes=["logo-pequeno"])
+            logo2 = gr.Image(value="logo.png", type="filepath", show_label=False, show_download_button=False, container=False, height=80, width=80)
             gr.Markdown("<h1 style='font-size:55px; font-family: Arial, sans-serif;'>CandiLVerse</h1>")
 
         with gr.Row():
