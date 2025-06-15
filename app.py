@@ -80,7 +80,7 @@ with gr.Blocks(css=tema_css) as interfaz:
     with login:
         with gr.Row():
             with gr.Column(scale=0):  # Le damos escala 0 o muy pequeña
-                gr.Image("logo.png", height=60, width=60, show_label=False)
+                gr.Image("logo.png", height=100, width=100, show_label=False)
             with gr.Column():
                 gr.Markdown("<h1 style='font-size:45px;color:#0C4876'>CandiLVerse</h1>")
         gr.Markdown("## Iniciar sesión")
@@ -94,7 +94,7 @@ with gr.Blocks(css=tema_css) as interfaz:
     with filtros:
         with gr.Row():
             with gr.Column(scale=0):  # Le damos escala 0 o muy pequeña
-                gr.Image("logo.png", height=60, width=60, show_label=False)
+                gr.Image("logo.png", height=100, width=100, show_label=False)
             with gr.Column():
                 gr.Markdown("<h1 style='font-size:45px;color:#0C4876'>CandiLVerse</h1>")
 
