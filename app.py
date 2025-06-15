@@ -60,8 +60,8 @@ iface = gr.Interface(
     inputs=inputs,
     outputs=outputs,
     live=True,
-    allow_flagging="never",  # 🔧 Desactiva el botón de Flag
-    clear_button="Borrar todos los filtros"  # 🔧 Personaliza el texto del botón Clear
+    allow_flagging="never",  
+    clear_button="Borrar todos los filtros"  
 )
 
 # Para que funcione en Render
