@@ -51,7 +51,7 @@ def limpiar_filtros():
 # Paleta de colores personalizada
 tema_css = """
 .gradio-container {
-    background-color: #E9E1DA;
+    background-color: #AEC5D8;
 }
 h1 {
     color: #0C4876;
@@ -78,12 +78,9 @@ with gr.Blocks(css=tema_css) as interfaz:
     # LOGIN
     login = gr.Column(visible=True)
     with login:
-        gr.HTML("""
-            <div style='display: flex; align-items: center; gap: 20px;'>
-                <img src='logo.png' style='height: 80px;'>
-                <h1>CandiLVerse</h1>
-            </div>
-        """)
+        with gr.Row():
+            logo = gr.Image(value="logo.png", type="filepath", show_label=False, show_download_button=False, container=False)
+            gr.Markdown("<h1 style='font-size:55px; font-family: Arial, sans-serif;'>CandiLVerse</h1>")
         gr.Markdown("## Iniciar sesión")
         usuario_input = gr.Textbox(label="Usuario")
         contraseña_input = gr.Textbox(label="Contraseña", type="password")
@@ -93,12 +90,9 @@ with gr.Blocks(css=tema_css) as interfaz:
     # PANTALLA PRINCIPAL DE FILTROS
     filtros = gr.Column(visible=False)
     with filtros:
-        gr.HTML("""
-            <div style='display: flex; align-items: center; gap: 20px;'>
-                <img src='logo.png' style='height: 80px;'>
-                <h1>CandiLVerse</h1>
-            </div>
-        """)
+        with gr.Row():
+            logo2 = gr.Image(value="logo.png", type="filepath", show_label=False, show_download_button=False, container=False)
+            gr.Markdown("<h1 style='font-size:55px; font-family: Arial, sans-serif;'>CandiLVerse</h1>")
 
         with gr.Row():
             nombre = gr.Textbox(label="Filtro por Nombre")
