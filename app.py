@@ -1,5 +1,6 @@
 import gradio as gr
 import pandas as pd
+import os
 
 # Leer directamente el archivo CSV fijo (que está subido a GitHub y Render lo tiene en el mismo directorio)
 CSV_FILE = "datos.csv"
@@ -76,7 +77,7 @@ with gr.Blocks() as interfaz:
         outputs=[nombre, apellidos, fecha_inicio, fecha_fin]
     )
 
-interfaz.launch()
+interfaz.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))
 
 
 
