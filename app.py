@@ -2,12 +2,15 @@ import gradio as gr
 import pandas as pd
 import os
 
-# Función para procesar el CSV y aplicar filtros
-def procesar_csv(csv_file, nombre_filtro, apellidos_filtro, fecha_inicio_filtro, fecha_fin_filtro):
+# Ruta fija al CSV (supongamos que siempre se llama igual)
+CSV_PATH = "prueba.csv"
+
+# Función para aplicar filtros sobre el CSV que ya está subido
+def procesar_csv(nombre_filtro, apellidos_filtro, fecha_inicio_filtro, fecha_fin_filtro):
     try:
-        df = pd.read_csv(csv_file.name)
+        df = pd.read_csv(CSV_PATH)
     except Exception:
-        df = pd.read_csv(csv_file.name, sep=None, engine='python')
+        df = pd.read_csv(CSV_PATH, sep=None, engine='python')
 
     df_limpio = df.copy()
 
@@ -33,9 +36,8 @@ def procesar_csv(csv_file, nombre_filtro, apellidos_filtro, fecha_inicio_filtro,
 
     return df_limpio
 
-# Crear la interfaz de Gradio
+# Crear la interfaz de Gradio sin necesidad de subir el CSV
 inputs = [
-    gr.File(label="Sube el archivo CSV"),
     gr.Textbox(label="Filtro por Nombre"),
     gr.Textbox(label="Filtro por Apellidos"),
     gr.Textbox(label="Fecha de inicio (dd/mm/yyyy)", placeholder="Formato: dd/mm/yyyy"),
@@ -50,6 +52,11 @@ iface = gr.Interface(
     outputs=outputs,
     live=True
 )
+
+# IMPORTANTE: Para Render
+port = int(os.environ.get("PORT", 7860))
+iface.launch(server_name="0.0.0.0", server_port=port)
+
 
 port = int(os.environ.get("PORT", 7860))
 iface.launch(server_name="0.0.0.0", server_port=port)
