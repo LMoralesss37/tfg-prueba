@@ -22,7 +22,7 @@ def procesar_csv(nombre_filtro, apellidos_filtro, fecha_inicio_filtro, fecha_fin
     except Exception as e:
         return f"Error leyendo el CSV: {e}"
 
-    df_limpio = df.copy().dropna()
+    df_limpio = df.copy()
     if 'Hora de conexión' in df_limpio.columns:
         df_limpio['Hora de conexión'] = df_limpio['Hora de conexión'].astype(str).str.split('.').str[0]
     if 'Tiempo de juego' in df_limpio.columns:
