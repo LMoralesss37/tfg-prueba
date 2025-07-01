@@ -72,7 +72,7 @@ def generar_identificador():
     justify-content: center;
 '>
     <span style='font-size: 60px; font-weight: bold; color: #0C4876;'>
-        🆔 {nuevo}
+         {nuevo}
     </span>
 </div>
 """
@@ -139,7 +139,7 @@ with gr.Blocks(css=tema_css) as interfaz:
             # Columna derecha: ID generado en recuadro alto y centrado
             with gr.Column(scale=1):
                 boton_generar_id = gr.Button("Generar ID único", scale=1)
-                id_generado = gr.Markdown("", scale=1)
+                id_generado = gr.Markdown("")
 
         salida = gr.Dataframe(value=pd.DataFrame(columns=[
             "Identificador", "Fecha de conexión", "Hora de conexión", 
