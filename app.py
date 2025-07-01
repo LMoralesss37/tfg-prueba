@@ -32,23 +32,24 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
         df_limpio['Tiempo de juego'] = df_limpio['Tiempo de juego'].astype(str).str.split('.').str[0]
 
     if 'Fecha de conexión' in df_limpio.columns:
-        # 1. Detectar automáticamente el formato real
         df_limpio['Fecha de conexión'] = pd.to_datetime(df_limpio['Fecha de conexión'], errors='coerce')
-
-        # 2. Aplicar filtros si se indican
-        if fecha_inicio_filtro and fecha_fin_filtro:
-            try:
-                fecha_inicio = pd.to_datetime(fecha_inicio_filtro, format='%d/%m/%Y', errors='coerce')
-                fecha_fin = pd.to_datetime(fecha_fin_filtro, format='%d/%m/%Y', errors='coerce')
-                df_limpio = df_limpio[
-                    (df_limpio['Fecha de conexión'] >= fecha_inicio) &
-                    (df_limpio['Fecha de conexión'] <= fecha_fin)
-                ]
-            except Exception as e:
-                return f"Error en el filtrado de fechas: {e}"
-
-        # 3. Formatear para mostrar como dd/mm/yyyy
+    
+        fecha_inicio = pd.to_datetime(fecha_inicio_filtro, format='%d/%m/%Y', errors='coerce') if fecha_inicio_filtro else None
+        fecha_fin = pd.to_datetime(fecha_fin_filtro, format='%d/%m/%Y', errors='coerce') if fecha_fin_filtro else None
+    
+        if fecha_inicio and fecha_fin:
+            df_limpio = df_limpio[
+                (df_limpio['Fecha de conexión'] >= fecha_inicio) &
+                (df_limpio['Fecha de conexión'] <= fecha_fin)
+            ]
+        elif fecha_inicio:
+            df_limpio = df_limpio[df_limpio['Fecha de conexión'] >= fecha_inicio]
+        elif fecha_fin:
+            df_limpio = df_limpio[df_limpio['Fecha de conexión'] <= fecha_fin]
+    
+        # Volver a formatear para mostrar
         df_limpio['Fecha de conexión'] = df_limpio['Fecha de conexión'].dt.strftime('%d/%m/%Y')
+
 
     if identificador_filtro:
         df_limpio = df_limpio[df_limpio['ID'].astype(str).str.contains(identificador_filtro, case=False, na=False)]
