@@ -115,7 +115,10 @@ with gr.Blocks(css=tema_css) as interfaz:
 
         with gr.Row():
             identificador = gr.Textbox(label="Filtro por Identificador")
+
+        with gr.Row():
             boton_generar_id = gr.Button("Generar ID único")
+            id_generado = gr.Textbox(label="ID generado", interactive=False)
 
         with gr.Row():
             fecha_inicio = gr.Textbox(label="Fecha de inicio (dd/mm/yyyy)", placeholder="Formato: dd/mm/yyyy")
@@ -131,7 +134,7 @@ with gr.Blocks(css=tema_css) as interfaz:
 
         boton_filtrar.click(fn=procesar_csv, inputs=[identificador, fecha_inicio, fecha_fin], outputs=salida)
         boton_borrar.click(fn=limpiar_filtros, inputs=[], outputs=[identificador, fecha_inicio, fecha_fin])
-        boton_generar_id.click(fn=generar_identificador, inputs=[], outputs=identificador)
+        boton_generar_id.click(fn=generar_identificador, inputs=[], outputs=id_generado)
 
     # Conexión de login con la interfaz principal
     login_boton.click(fn=verificar_login, inputs=[usuario_input, contraseña_input], outputs=[login, filtros, mensaje_login])
