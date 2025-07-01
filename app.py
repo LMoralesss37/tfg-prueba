@@ -85,20 +85,25 @@ input, textarea {
     background-color: #C2ACB4 !important;
     color: #0C4876;
 }
-/* Contenedor visual del ID generado */
+
+/* Contenedor blanco del ID generado */
 #id-generado-container {
     background-color: white;
-    padding: 20px;
+    padding: 40px 20px;
     border-radius: 10px;
     margin-top: 10px;
+    width: 100%;
 }
+
+/* Estilo del texto del ID */
 #id-generado-text {
-    font-size: 32px;
+    font-size: 50px;
     font-weight: bold;
     color: #0C4876;
     text-align: center;
 }
 """
+
 
 # Interfaz principal
 with gr.Blocks(css=tema_css) as interfaz:
@@ -136,10 +141,11 @@ with gr.Blocks(css=tema_css) as interfaz:
                 boton_borrar = gr.Button("Borrar todos los filtros")
 
             # Columna derecha: ID generado en "pantallita blanca"
-            with gr.Column():
-                boton_generar_id = gr.Button("Generar ID único")
+            with gr.Column(scale=1):  # hace que ocupe todo el ancho disponible
+                boton_generar_id = gr.Button("Generar ID único", scale=1)
                 with gr.Column(elem_id="id-generado-container"):
                     id_generado = gr.Markdown("", elem_id="id-generado-text")
+
 
         salida = gr.Dataframe(value=pd.DataFrame(columns=[
             "Identificador", "Fecha de conexión", "Hora de conexión", 
