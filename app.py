@@ -19,7 +19,7 @@ def verificar_login(usuario, contraseña):
 # Procesamiento CSV con filtros
 def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
     try:
-        df = pd.read_csv(CSV_FILE, encoding="latin1")
+        df = pd.read_csv(CSV_FILE)
     except Exception as e:
         print(f"Error leyendo el CSV: {e}")
         return pd.DataFrame()
