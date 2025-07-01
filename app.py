@@ -50,7 +50,7 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
 def limpiar_filtros():
     return "", "", ""
 
-# Generar ID único (Markdown estilizado)
+# Generar ID único
 def generar_identificador():
     try:
         df = pd.read_csv(CSV_FILE)
@@ -131,25 +131,27 @@ with gr.Blocks(css=tema_css) as interfaz:
                 boton_filtrar = gr.Button("Filtrar")
                 boton_borrar = gr.Button("Borrar todos los filtros")
 
-            # Columna derecha: Generador de ID en pantallita
+            # Columna derecha: Simulación de pantallita blanca
             with gr.Column():
-                with gr.Box():
-                    gr.Markdown("### Generar nuevo ID")
-                    boton_generar_id = gr.Button("Generar ID único")
-                    id_generado = gr.Markdown("", elem_id="id-generado-box")
+                gr.Markdown("""
+                <div style='background-color:white; padding:20px; border-radius:10px; text-align:center;'>
+                    <h3 style='color:#0C4876'>Generar nuevo ID</h3>
+                </div>
+                """, unsafe_allow_html=True)
+                boton_generar_id = gr.Button("Generar ID único")
+                id_generado = gr.Markdown("", elem_id="id-generado-box")
 
         salida = gr.Dataframe(value=pd.DataFrame(columns=[
             "Identificador", "Fecha de conexión", "Hora de conexión", 
             "Tiempo de juego", "% tarea completado", "Dolor"
         ]))
 
-        # Eventos
+        # Conexión de funciones
         boton_filtrar.click(fn=procesar_csv, inputs=[identificador, fecha_inicio, fecha_fin], outputs=salida)
         boton_borrar.click(fn=limpiar_filtros, inputs=[], outputs=[identificador, fecha_inicio, fecha_fin])
         boton_generar_id.click(fn=generar_identificador, inputs=[], outputs=id_generado)
 
-    # Conexión login -> interfaz
     login_boton.click(fn=verificar_login, inputs=[usuario_input, contraseña_input], outputs=[login, filtros, mensaje_login])
 
-# Lanzar interfaz
+# Lanzar la app
 interfaz.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))
