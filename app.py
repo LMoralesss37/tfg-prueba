@@ -50,7 +50,7 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
 def limpiar_filtros():
     return "", "", ""
 
-# Generar identificador único
+# Generar ID único con estilo visual embebido
 def generar_identificador():
     try:
         df = pd.read_csv(CSV_FILE)
@@ -61,7 +61,21 @@ def generar_identificador():
     while True:
         nuevo = str(random.randint(100000, 999999))
         if nuevo not in existentes:
-            return f"🆔 ID generado: `{nuevo}`"
+            return f"""
+<div style='
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+'>
+    <span style='font-size: 60px; font-weight: bold; color: #0C4876;'>
+        🆔 {nuevo}
+    </span>
+</div>
+"""
 
 # Tema visual
 tema_css = """
@@ -85,25 +99,7 @@ input, textarea {
     background-color: #C2ACB4 !important;
     color: #0C4876;
 }
-
-/* Contenedor blanco del ID generado */
-#id-generado-container {
-    background-color: white;
-    padding: 40px 20px;
-    border-radius: 10px;
-    margin-top: 10px;
-    width: 100%;
-}
-
-/* Estilo del texto del ID */
-#id-generado-text {
-    font-size: 50px;
-    font-weight: bold;
-    color: #0C4876;
-    text-align: center;
-}
 """
-
 
 # Interfaz principal
 with gr.Blocks(css=tema_css) as interfaz:
@@ -140,12 +136,10 @@ with gr.Blocks(css=tema_css) as interfaz:
                 boton_filtrar = gr.Button("Filtrar")
                 boton_borrar = gr.Button("Borrar todos los filtros")
 
-            # Columna derecha: ID generado en "pantallita blanca"
-            with gr.Column(scale=1):  # hace que ocupe todo el ancho disponible
+            # Columna derecha: ID generado en recuadro alto y centrado
+            with gr.Column(scale=1):
                 boton_generar_id = gr.Button("Generar ID único", scale=1)
-                with gr.Column(elem_id="id-generado-container"):
-                    id_generado = gr.Markdown("", elem_id="id-generado-text")
-
+                id_generado = gr.Markdown("", scale=1)
 
         salida = gr.Dataframe(value=pd.DataFrame(columns=[
             "Identificador", "Fecha de conexión", "Hora de conexión", 
