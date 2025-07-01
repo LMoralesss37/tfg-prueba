@@ -24,29 +24,37 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
         print(f"Error leyendo el CSV: {e}")
         return pd.DataFrame()
 
-
     df_limpio = df.copy()
 
     if 'Hora de conexión' in df_limpio.columns:
         df_limpio['Hora de conexión'] = df_limpio['Hora de conexión'].astype(str).str.split('.').str[0]
     if 'Tiempo de juego' in df_limpio.columns:
         df_limpio['Tiempo de juego'] = df_limpio['Tiempo de juego'].astype(str).str.split('.').str[0]
+
     if 'Fecha de conexión' in df_limpio.columns:
-        df_limpio['Fecha de conexión'] = pd.to_datetime(df_limpio['Fecha de conexión'], errors='coerce', format='%d/%m/%Y')
+        # 1. Detectar automáticamente el formato real
+        df_limpio['Fecha de conexión'] = pd.to_datetime(df_limpio['Fecha de conexión'], errors='coerce')
+
+        # 2. Aplicar filtros si se indican
+        if fecha_inicio_filtro and fecha_fin_filtro:
+            try:
+                fecha_inicio = pd.to_datetime(fecha_inicio_filtro, format='%d/%m/%Y', errors='coerce')
+                fecha_fin = pd.to_datetime(fecha_fin_filtro, format='%d/%m/%Y', errors='coerce')
+                df_limpio = df_limpio[
+                    (df_limpio['Fecha de conexión'] >= fecha_inicio) &
+                    (df_limpio['Fecha de conexión'] <= fecha_fin)
+                ]
+            except Exception as e:
+                return f"Error en el filtrado de fechas: {e}"
+
+        # 3. Formatear para mostrar como dd/mm/yyyy
+        df_limpio['Fecha de conexión'] = df_limpio['Fecha de conexión'].dt.strftime('%d/%m/%Y')
 
     if identificador_filtro:
-        df_limpio = df_limpio[df_limpio['Identificador'].astype(str).str.contains(identificador_filtro, case=False, na=False)]
+        df_limpio = df_limpio[df_limpio['ID'].astype(str).str.contains(identificador_filtro, case=False, na=False)]
 
-    if fecha_inicio_filtro and fecha_fin_filtro:
-        try:
-            fecha_inicio = pd.to_datetime(fecha_inicio_filtro, format='%d/%m/%Y', errors='coerce')
-            fecha_fin = pd.to_datetime(fecha_fin_filtro, format='%d/%m/%Y', errors='coerce')
-            df_limpio = df_limpio[(df_limpio['Fecha de conexión'] >= fecha_inicio) & (df_limpio['Fecha de conexión'] <= fecha_fin)]
-        except Exception as e:
-            return f"Error en el filtrado de fechas: {e}"
-
-    df_limpio['Fecha de conexión'] = df_limpio['Fecha de conexión'].dt.strftime('%d/%m/%Y')
     return df_limpio
+
 
 # Limpiar filtros
 def limpiar_filtros():
@@ -56,7 +64,7 @@ def limpiar_filtros():
 def generar_identificador():
     try:
         df = pd.read_csv(CSV_FILE)
-        existentes = set(df['Identificador'].astype(str).values)
+        existentes = set(df['ID'].astype(str).values)
     except:
         existentes = set()
 
