@@ -54,6 +54,22 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
     if identificador_filtro:
         df_limpio = df_limpio[df_limpio['ID'].astype(str).str.contains(identificador_filtro, case=False, na=False)]
 
+    if 'Fecha de conexión' in df_limpio.columns and 'Hora de conexión' in df_limpio.columns:
+        # Unificamos fecha y hora en una columna nueva para ordenar
+        try:
+            fecha_hora = pd.to_datetime(
+                df_limpio['Fecha de conexión'].astype(str) + ' ' + df_limpio['Hora de conexión'].astype(str),
+                format='%d/%m/%Y %H:%M:%S', errors='coerce'
+            )
+        except:
+            fecha_hora = pd.to_datetime(
+                df_limpio['Fecha de conexión'].astype(str) + ' ' + df_limpio['Hora de conexión'].astype(str),
+                errors='coerce'
+            )
+
+        df_limpio['FechaHora'] = fecha_hora
+        df_limpio = df_limpio.sort_values(by='FechaHora', ascending=False).drop(columns=['FechaHora'])
+
     return df_limpio
 
 
