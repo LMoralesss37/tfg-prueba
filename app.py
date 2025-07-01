@@ -16,7 +16,7 @@ def verificar_login(usuario, contraseña):
     else:
         return None, None, "Usuario o contraseña incorrecta."
 
-# Función para procesar CSV con filtros
+# Procesar CSV con filtros
 def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
     try:
         df = pd.read_csv(CSV_FILE)
@@ -50,7 +50,7 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
 def limpiar_filtros():
     return "", "", ""
 
-# Generar ID único y mostrarlo con Markdown
+# Generar ID único (Markdown estilizado)
 def generar_identificador():
     try:
         df = pd.read_csv(CSV_FILE)
@@ -61,7 +61,7 @@ def generar_identificador():
     while True:
         nuevo = str(random.randint(100000, 999999))
         if nuevo not in existentes:
-            return f"### 🆔 ID generado: `{nuevo}`"
+            return f"🆔 ID generado: `{nuevo}`"
 
 # Tema visual CSS
 tema_css = """
@@ -84,6 +84,15 @@ input, textarea {
 .dataframe thead {
     background-color: #C2ACB4 !important;
     color: #0C4876 !important;
+}
+
+/* Estilo del ID generado */
+#id-generado-box {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    color: #0C4876;
+    margin-top: 10px;
 }
 """
 
@@ -122,11 +131,12 @@ with gr.Blocks(css=tema_css) as interfaz:
                 boton_filtrar = gr.Button("Filtrar")
                 boton_borrar = gr.Button("Borrar todos los filtros")
 
-            # Columna derecha: Generador de ID visual con Markdown
+            # Columna derecha: Generador de ID en pantallita
             with gr.Column():
-                gr.Markdown("### Generar nuevo ID")
-                boton_generar_id = gr.Button("Generar ID único")
-                id_generado = gr.Markdown("")
+                with gr.Box():
+                    gr.Markdown("### Generar nuevo ID")
+                    boton_generar_id = gr.Button("Generar ID único")
+                    id_generado = gr.Markdown("", elem_id="id-generado-box")
 
         salida = gr.Dataframe(value=pd.DataFrame(columns=[
             "Identificador", "Fecha de conexión", "Hora de conexión", 
@@ -138,8 +148,8 @@ with gr.Blocks(css=tema_css) as interfaz:
         boton_borrar.click(fn=limpiar_filtros, inputs=[], outputs=[identificador, fecha_inicio, fecha_fin])
         boton_generar_id.click(fn=generar_identificador, inputs=[], outputs=id_generado)
 
-    # Mostrar pantalla principal tras login
+    # Conexión login -> interfaz
     login_boton.click(fn=verificar_login, inputs=[usuario_input, contraseña_input], outputs=[login, filtros, mensaje_login])
 
-# Lanzamiento
+# Lanzar interfaz
 interfaz.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))
