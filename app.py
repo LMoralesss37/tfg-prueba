@@ -16,7 +16,7 @@ def verificar_login(usuario, contraseña):
     else:
         return None, None, "Usuario o contraseña incorrecta."
 
-# Procesar CSV con filtros
+# Procesamiento CSV con filtros
 def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
     try:
         df = pd.read_csv(CSV_FILE)
@@ -34,7 +34,7 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
 
     if identificador_filtro:
         df_limpio = df_limpio[df_limpio['Identificador'].astype(str).str.contains(identificador_filtro, case=False, na=False)]
-    
+
     if fecha_inicio_filtro and fecha_fin_filtro:
         try:
             fecha_inicio = pd.to_datetime(fecha_inicio_filtro, format='%d/%m/%Y', errors='coerce')
@@ -50,7 +50,7 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
 def limpiar_filtros():
     return "", "", ""
 
-# Generar ID único
+# Generar identificador único
 def generar_identificador():
     try:
         df = pd.read_csv(CSV_FILE)
@@ -63,7 +63,7 @@ def generar_identificador():
         if nuevo not in existentes:
             return f"🆔 ID generado: `{nuevo}`"
 
-# Tema visual CSS
+# Tema visual
 tema_css = """
 .gradio-container {
     background-color: #AEC5D8;
@@ -83,16 +83,20 @@ input, textarea {
 }
 .dataframe thead {
     background-color: #C2ACB4 !important;
-    color: #0C4876 !important;
+    color: #0C4876;
 }
-
-/* Estilo del ID generado */
-#id-generado-box {
+/* Contenedor visual del ID generado */
+#id-generado-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+#id-generado-text {
     font-size: 32px;
     font-weight: bold;
-    text-align: center;
     color: #0C4876;
-    margin-top: 10px;
+    text-align: center;
 }
 """
 
@@ -123,7 +127,7 @@ with gr.Blocks(css=tema_css) as interfaz:
                 gr.Markdown("<h1 style='font-size:45px;color:#0C4876'>CandiLVerse</h1>")
 
         with gr.Row():
-            # Columna izquierda: Filtros
+            # Columna izquierda: filtros
             with gr.Column():
                 identificador = gr.Textbox(label="Filtro por Identificador")
                 fecha_inicio = gr.Textbox(label="Fecha de inicio (dd/mm/yyyy)", placeholder="Formato: dd/mm/yyyy")
@@ -131,27 +135,23 @@ with gr.Blocks(css=tema_css) as interfaz:
                 boton_filtrar = gr.Button("Filtrar")
                 boton_borrar = gr.Button("Borrar todos los filtros")
 
-            # Columna derecha: Simulación de pantallita blanca
+            # Columna derecha: ID generado en "pantallita blanca"
             with gr.Column():
-                gr.Markdown("""
-                <div style='background-color:white; padding:20px; border-radius:10px; text-align:center;'>
-                    <h3 style='color:#0C4876'>Generar nuevo ID</h3>
-                </div>
-                """, unsafe_allow_html=True)
                 boton_generar_id = gr.Button("Generar ID único")
-                id_generado = gr.Markdown("", elem_id="id-generado-box")
+                with gr.Column(elem_id="id-generado-container"):
+                    id_generado = gr.Markdown("", elem_id="id-generado-text")
 
         salida = gr.Dataframe(value=pd.DataFrame(columns=[
             "Identificador", "Fecha de conexión", "Hora de conexión", 
             "Tiempo de juego", "% tarea completado", "Dolor"
         ]))
 
-        # Conexión de funciones
+        # Conexiones
         boton_filtrar.click(fn=procesar_csv, inputs=[identificador, fecha_inicio, fecha_fin], outputs=salida)
         boton_borrar.click(fn=limpiar_filtros, inputs=[], outputs=[identificador, fecha_inicio, fecha_fin])
         boton_generar_id.click(fn=generar_identificador, inputs=[], outputs=id_generado)
 
     login_boton.click(fn=verificar_login, inputs=[usuario_input, contraseña_input], outputs=[login, filtros, mensaje_login])
 
-# Lanzar la app
+# Lanzamiento
 interfaz.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))
