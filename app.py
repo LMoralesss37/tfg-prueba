@@ -71,8 +71,10 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
         mask_incompleto = df_limpio['% tarea completado'] < 100
 
         if 'Ajuste de nivel' in df_limpio.columns:
+            df_limpio['Ajuste de nivel'] = df_limpio['Ajuste de nivel'].astype(str)
             df_limpio.loc[mask_incompleto, 'Ajuste de nivel'] = "No ha terminado el ejercicio"
         if 'Dolor' in df_limpio.columns:
+            df_limpio['Dolor'] = df_limpio['Dolor'].astype(str)
             df_limpio.loc[mask_incompleto, 'Dolor'] = "No ha terminado el ejercicio"
 
     return df_limpio
