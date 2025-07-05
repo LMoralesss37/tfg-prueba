@@ -172,7 +172,8 @@ with gr.Blocks(css=tema_css) as interfaz:
             "ID", "Edad", "Altura", "Peso", "Articulación", "Descripción de la tarea",
             "Nivel de dificultad", "Hombro a rehabilitar", "FC mínima", "FC máxima", "FC media",
             "Fecha de conexión", "Hora de conexión", "Tiempo de juego", "% tarea completado",
-            "Series", "Repeticiones completas", "Ajuste de nivel", "Dolor"
+            "Series", "Repeticiones completas", "Repeticiones rápidas", "Repeticiones bien", 
+            "Ajuste de nivel", "Dolor"
         ]))
 
         # Conexiones
