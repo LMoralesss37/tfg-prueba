@@ -3,20 +3,17 @@ import pandas as pd
 import random
 import os
 
-# Usuario y contraseña válidos
 USUARIO_VALIDO = "admin"
 CONTRASEÑA_VALIDA = "1234"
 
 CSV_FILE = "datos.csv"
 
-# Función de login
 def verificar_login(usuario, contraseña):
     if usuario == USUARIO_VALIDO and contraseña == CONTRASEÑA_VALIDA:
         return gr.update(visible=False), gr.update(visible=True), ""
     else:
         return None, None, "Usuario o contraseña incorrecta."
 
-# Procesamiento CSV con filtros
 def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
     try:
         df = pd.read_csv(CSV_FILE)
@@ -47,9 +44,7 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
         elif fecha_fin:
             df_limpio = df_limpio[df_limpio['Fecha de conexión'] <= fecha_fin]
     
-        # Volver a formatear para mostrar
         df_limpio['Fecha de conexión'] = df_limpio['Fecha de conexión'].dt.strftime('%d/%m/%Y')
-
 
     if identificador_filtro:
         df_limpio = df_limpio[df_limpio['ID'].astype(str).str.contains(identificador_filtro, case=False, na=False)]
@@ -70,14 +65,22 @@ def procesar_csv(identificador_filtro, fecha_inicio_filtro, fecha_fin_filtro):
         df_limpio['FechaHora'] = fecha_hora
         df_limpio = df_limpio.sort_values(by='FechaHora', ascending=False).drop(columns=['FechaHora'])
 
+    if '% tarea completado' in df_limpio.columns:
+        df_limpio['% tarea completado'] = pd.to_numeric(df_limpio['% tarea completado'], errors='coerce')
+        
+        mask_incompleto = df_limpio['% tarea completado'] < 100
+
+        if 'Ajuste de nivel' in df_limpio.columns:
+            df_limpio.loc[mask_incompleto, 'Ajuste de nivel'] = "No ha terminado el ejercicio"
+        if 'Dolor' in df_limpio.columns:
+            df_limpio.loc[mask_incompleto, 'Dolor'] = "No ha terminado el ejercicio"
+
     return df_limpio
 
 
-# Limpiar filtros
 def limpiar_filtros():
     return "", "", ""
 
-# Generar ID único con estilo visual embebido
 def generar_identificador():
     try:
         df = pd.read_csv(CSV_FILE)
@@ -104,7 +107,6 @@ def generar_identificador():
 </div>
 """
 
-# Tema visual
 tema_css = """
 .gradio-container {
     background-color: #AEC5D8;
@@ -128,10 +130,8 @@ input, textarea {
 }
 """
 
-# Interfaz principal
 with gr.Blocks(css=tema_css) as interfaz:
 
-    # LOGIN
     login = gr.Column(visible=True)
     with login:
         with gr.Row():
@@ -145,7 +145,6 @@ with gr.Blocks(css=tema_css) as interfaz:
         login_boton = gr.Button("Acceder")
         mensaje_login = gr.Markdown("")
 
-    # PANTALLA PRINCIPAL
     filtros = gr.Column(visible=False)
     with filtros:
         with gr.Row():
@@ -155,7 +154,6 @@ with gr.Blocks(css=tema_css) as interfaz:
                 gr.Markdown("<h1 style='font-size:45px;color:#0C4876'>CandiLVerse</h1>")
 
         with gr.Row():
-            # Columna izquierda: filtros
             with gr.Column():
                 identificador = gr.Textbox(label="Filtro por Identificador")
                 fecha_inicio = gr.Textbox(label="Fecha de inicio (dd/mm/yyyy)", placeholder="Formato: dd/mm/yyyy")
@@ -163,7 +161,6 @@ with gr.Blocks(css=tema_css) as interfaz:
                 boton_filtrar = gr.Button("Filtrar")
                 boton_borrar = gr.Button("Borrar todos los filtros")
 
-            # Columna derecha: ID generado en recuadro alto y centrado
             with gr.Column(scale=1):
                 boton_generar_id = gr.Button("Generar ID único", scale=1)
                 id_generado = gr.Markdown("")
@@ -176,12 +173,10 @@ with gr.Blocks(css=tema_css) as interfaz:
             "Ajuste de nivel", "Dolor"
         ]))
 
-        # Conexiones
         boton_filtrar.click(fn=procesar_csv, inputs=[identificador, fecha_inicio, fecha_fin], outputs=salida)
         boton_borrar.click(fn=limpiar_filtros, inputs=[], outputs=[identificador, fecha_inicio, fecha_fin])
         boton_generar_id.click(fn=generar_identificador, inputs=[], outputs=id_generado)
 
     login_boton.click(fn=verificar_login, inputs=[usuario_input, contraseña_input], outputs=[login, filtros, mensaje_login])
 
-# Lanzamiento
 interfaz.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 7860)))
